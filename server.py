@@ -1,9 +1,8 @@
 #  coding: utf-8 
 import SocketServer
+import mimetypes
+import os.path
 
-import os
-
-import mimType
 
 # Copyright 2013 Abram Hindle, Eddie Antonio Santos
 # 
@@ -34,12 +33,12 @@ import mimType
 class MyWebServer(SocketServer.BaseRequestHandler):
     
     def handle(self):
+
         self.data = self.request.recv(1024).strip()
         print ("Got a request of: %s\n" % self.data)
         
         
         find = self.data.split()
-        
         
         if (len(find) == 0):
             self.request.sendall("HTTP/1.1 404 Not Found\n")
@@ -57,6 +56,8 @@ class MyWebServer(SocketServer.BaseRequestHandler):
             URL= URL[:-1]
 
         path = os.path.realpath (os.getcwd() + URL)
+
+	print(path)
         if os.path.isfile(path):
             if os.getcwd() in path:
                 content, type = self.read_file(path)
@@ -68,18 +69,18 @@ class MyWebServer(SocketServer.BaseRequestHandler):
         elif os.path.isdir(path):
             if os.getcwd() in path:
                 new_path = os.getcwd() + path + "/index.html"
-                    if os.path.isfile(new_path):
-                        if os.getcwd() in new_path:
-                                self.request.sendall("HTTP/1.1 "+"302 " +"Found\r\n"+ "Location: " +new_path)
+                if os.path.isfile(new_path):
+                    if os.getcwd() in new_path:
+                        self.request.sendall("HTTP/1.1 "+"302 " +"Found\r\n"+ "Location: " +new_path)
 
-                        else:
-                            self.request.sendall("HTTP/1.1 404 Not Found\r\n" + "Content-Type: text/plain\n"+"\r\n"+"Error 404, Page Not Found")
+                    else:
+                        self.request.sendall("HTTP/1.1 404 Not Found\r\n" + "Content-Type: text/plain\n"+"\r\n"+"Error 404, Page Not Found")
 
 
         else:
             self.request.sendall("HTTP/1.1 404 Not Found\r\n" + "Content-Type: text/plain\n"+"\r\n"+"Error 404, Page Not Found")
 
-    def read_file(self.path):
+    def read_file(self, path):
         try:
             
             open_file = open(path,"r")
