@@ -43,7 +43,8 @@ class MyWebServer(SocketServer.BaseRequestHandler):
         if (len(find) == 0):
             self.request.sendall("HTTP/1.1 404 Not Found\n")
         
-        
+	print (find)        
+
         request = find[0]
         
         URL = find[1]
@@ -55,30 +56,43 @@ class MyWebServer(SocketServer.BaseRequestHandler):
         if URL[-1] == "/":
             URL= URL[:-1]
 
+	print(URL)
         path = os.path.realpath (os.getcwd() + URL)
-
+	print ("if item yo?: \n")
 	print(path)
+	print ("\n")
+	print (URL)
         if os.path.isfile(path):
+	    print ("check if it is a file?\n")
             if os.getcwd() in path:
                 content, type = self.read_file(path)
                 self.request.sendall("HTTP/1.1 "+"200 " +"OK\r\n"+ "Content-Type: "+type + "\r\n"+content)
                     
             else:
-                self.request.sendall("HTTP/1.1 404 Not Found\r\n" + "Content-Type: text/plain\n"+"\r\n"+"Error 404, Page Not Found")
+                self.request.sendall("HTTP/1.1 404 Not Found\r\n" + "Content-Type: text/plain\n"+"\r\n"+"Error 404, Hi Page Not Found")
 
         elif os.path.isdir(path):
+		
+	    print ("Hello i'm here!\n")
             if os.getcwd() in path:
-                new_path = os.getcwd() + path + "/index.html"
-                if os.path.isfile(new_path):
-                    if os.getcwd() in new_path:
-                        self.request.sendall("HTTP/1.1 "+"302 " +"Found\r\n"+ "Location: " +new_path)
+                new_path = URL + "/index.html"
+		new_path_check = os.getcwd()+ URL + "/index.html"
+		print ("if path?: \n")	
+		print (new_path)
+		print (new_path_check)
+		print ("\n")
+                if os.path.isfile(new_path_check):
+
+		    print (os.getcwd())
+                    if os.getcwd() in new_path_check:
+                        self.request.sendall("HTTP/1.1 "+"302 " +"Found\r\n"+ "Content-Type: text/plain\n"+"\r\n" +"Location: " +new_path)
 
                     else:
                         self.request.sendall("HTTP/1.1 404 Not Found\r\n" + "Content-Type: text/plain\n"+"\r\n"+"Error 404, Page Not Found")
 
 
         else:
-            self.request.sendall("HTTP/1.1 404 Not Found\r\n" + "Content-Type: text/plain\n"+"\r\n"+"Error 404, Page Not Found")
+            self.request.sendall("HTTP/1.1 404 Not Found\r\n" + "Content-Type: text/plain\n"+"\r\n"+"Error 404, HI 3 Page Not Found")
 
     def read_file(self, path):
         try:
