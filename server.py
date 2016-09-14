@@ -1,6 +1,5 @@
 #  coding: utf-8 
 import SocketServer
-import mimetypes
 import os.path
 
 
@@ -40,12 +39,9 @@ class MyWebServer(SocketServer.BaseRequestHandler):
         
         find = self.data.split()
         
-        if (len(find) == 0):
-            self.request.sendall("HTTP/1.1 404 Not Found\n")
-        
 	print (find)        
 
-        request = find[0]
+#        request = find[0]
         
         URL = find[1]
         
@@ -53,58 +49,69 @@ class MyWebServer(SocketServer.BaseRequestHandler):
 
 
     def check_URL(self, URL):
-        if URL[-1] == "/":
-            URL= URL[:-1]
 
-	print(URL)
-        path = os.path.realpath (os.getcwd() + URL)
-	print ("if item yo?: \n")
-	print(path)
-	print ("\n")
-	print (URL)
-        if os.path.isfile(path):
-	    print ("check if it is a file?\n")
-            if os.getcwd() in path:
+        
+        path = "www" + URL
+
+
+        if os.path.isdir(path) or os.path.exists(path):
+            
+            
+            if os.path.isfile(path):
+                
+                print ("TEST: " + URL)
+            
+            
                 content, type = self.read_file(path)
-                self.request.sendall("HTTP/1.1 "+"200 " +"OK\r\n"+ "Content-Type: "+type + "\r\n"+content)
-                    
+                self.request.sendall("HTTP/1.1 "+"200 " +"OK\n"+ "Content-Type: "+ type + "\n\n"+content)
+            
+            
+
+                
+            elif path.endswith("/"):
+
+                new_path = path + "index.html"
+                
+                print ("HERE")
+                
+                print (URL)
+                
+                content, type = self.read_file(new_path)
+                        
+                self.request.sendall("HTTP/1.1 "+"200 " +"OK\n"+ "Content-Type: "+type + "\n\n"+content)
+            
+
             else:
-                self.request.sendall("HTTP/1.1 404 Not Found\r\n" + "Content-Type: text/plain\n"+"\r\n"+"Error 404, Hi Page Not Found")
-
-        elif os.path.isdir(path):
-		
-	    print ("Hello i'm here!\n")
-            if os.getcwd() in path:
-                new_path = URL + "/index.html"
-		new_path_check = os.getcwd()+ URL + "/index.html"
-		print ("if path?: \n")	
-		print (new_path)
-		print (new_path_check)
-		print ("\n")
-                if os.path.isfile(new_path_check):
-
-		    print (os.getcwd())
-                    if os.getcwd() in new_path_check:
-                        self.request.sendall("HTTP/1.1 "+"302 " +"Found\r\n"+ "Content-Type: text/plain\n"+"\r\n" +"Location: " +new_path)
-
-                    else:
-                        self.request.sendall("HTTP/1.1 404 Not Found\r\n" + "Content-Type: text/plain\n"+"\r\n"+"Error 404, Page Not Found")
+                
+                self.request.sendall("HTTP/1.1 404 Not Found\n" + "Content-Type: text/plain\n"+"\n\n"+"Error 404, Page Not Found")
 
 
         else:
-            self.request.sendall("HTTP/1.1 404 Not Found\r\n" + "Content-Type: text/plain\n"+"\r\n"+"Error 404, HI 3 Page Not Found")
+            self.request.sendall("HTTP/1.1 404 Not Found\n" + "Content-Type: text/plain\n"+"\n\n"+"Error 404, Page Not Found")
+
+
 
     def read_file(self, path):
         try:
             
-            open_file = open(path,"r")
+            open_file = open(path,"rb")
             contains = open_file.read()
             open_file.close()
 
         except IOError:
             return -1
+        
+        
+        
+        
+        if path.endswith(".css"):
+        
+            correct_mimtype = "text/css"
 
-        correct_mimtype, _ = mimetypes.guess_type(path)
+        if path.endswith(".html"):
+            correct_mimtype = "text/html"
+
+        print("WHAT TYPE: "+ correct_mimtype)
 
         return contains, correct_mimtype
 
