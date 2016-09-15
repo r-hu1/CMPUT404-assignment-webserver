@@ -82,7 +82,6 @@ class MyWebServer(SocketServer.BaseRequestHandler):
             
 
             else:
-                print ("hey " + URL)
                 
                 self.request.sendall("HTTP/1.1 404 Not Found\n" + "Content-Type: text/plain\n"+"\n\n"+"Error 404, Page Not Found")
 
