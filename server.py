@@ -30,18 +30,18 @@ import os.path
 
 
 class MyWebServer(SocketServer.BaseRequestHandler):
-    
-    def handle(self):
 
+    def handle(self):
+        
         self.data = self.request.recv(1024).strip()
-        print ("Got a request of: %s\n" % self.data)
+        #      print ("Got a request of: %s\n" % self.data)
         
         
         find = self.data.split()
         
-	print (find)        
+        #	print (find)
 
-#        request = find[0]
+        #   request = find[0]
         
         URL = find[1]
         
@@ -57,9 +57,9 @@ class MyWebServer(SocketServer.BaseRequestHandler):
         if os.path.isdir(path) or os.path.exists(path):
             
             
-            if os.path.isfile(path):
+            if os.path.isfile(path) and (path.endswith(".html") or path.endswith(".css")):
                 
-                print ("TEST: " + URL)
+                print path
             
             
                 content, type = self.read_file(path)
@@ -72,9 +72,9 @@ class MyWebServer(SocketServer.BaseRequestHandler):
 
                 new_path = path + "index.html"
                 
-                print ("HERE")
+                #print path
                 
-                print (URL)
+                #print (URL)
                 
                 content, type = self.read_file(new_path)
                         
@@ -82,6 +82,7 @@ class MyWebServer(SocketServer.BaseRequestHandler):
             
 
             else:
+                print ("hey " + URL)
                 
                 self.request.sendall("HTTP/1.1 404 Not Found\n" + "Content-Type: text/plain\n"+"\n\n"+"Error 404, Page Not Found")
 
@@ -92,6 +93,7 @@ class MyWebServer(SocketServer.BaseRequestHandler):
 
 
     def read_file(self, path):
+
         try:
             
             open_file = open(path,"rb")
@@ -105,13 +107,14 @@ class MyWebServer(SocketServer.BaseRequestHandler):
         
         
         if path.endswith(".css"):
-        
             correct_mimtype = "text/css"
 
-        if path.endswith(".html"):
+        elif path.endswith(".html"):
             correct_mimtype = "text/html"
-
-        print("WHAT TYPE: "+ correct_mimtype)
+        
+        
+        else:
+            correct_mimtype = "text/plain"
 
         return contains, correct_mimtype
 
